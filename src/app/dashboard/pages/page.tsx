@@ -1,4 +1,5 @@
 import prisma from "@/utils/db";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
 
 async function getData(userid: string) {
@@ -18,10 +19,18 @@ async function Pages() {
 
 
 ///////////////////Auth goes here////////////////////////////////////////////////////////////////////////////////////////////
+const { getUser } = getKindeServerSession()
+const user = await getUser()
 
+if (!user) {
+    redirect("/api/authlogin")
+}
 ///////////////////Auth goes here////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    const data = await getData();
-    return ()
+    const data = await getData(user.id);
+    return (
+        <>
+        </>
+    )
 }

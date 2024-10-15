@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id String @id @default(uuid()) // UUID for consistency
+  email String
+  firstName String 
+  lastName String
+  profileImage String
+
+  createdAt DateTime @default(now())
+
+  // 1 User <-> Many Pages (1:M relation)
+  pages Page[] @relation("UserPages")
+
+  // Relation for Notes directly linked to the user (if needed)
+  notes Note[] @relation("UserNotes")
+}
+
+model Page {
+  id String @id @default(uuid())
+  title String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relation to User (Many Pages <-> 1 User)
+  user User? @relation(fields: [userId], references: [id], name: "UserPages")
+  userId String // Foreign Key for User
+
+  // Relation to Notes (1 Page <-> Many Notes)
+  notes Note[] @relation("PageNotes")
+}
+
+model Note {
+  id String @id @default(uuid())
+  content Json // JSON to store the note content
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relation to Page (Many Notes <-> 1 Page)
+  page Page? @relation(fields: [pageId], references: [id], name: "PageNotes", onDelete: Cascade)
+  pageId String // Foreign Key for Page
+
+  // Relation to User (Many Notes <-> 1 User)
+  user User? @relation(fields: [userId], references: [id], name: "UserNotes")
+  userId String // Foreign Key for User
+}
+

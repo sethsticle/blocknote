@@ -55,6 +55,7 @@ export async function CreatePageAction(_prevState: unknown, formData: FormData) 
                     name: submission.value.name,
                     subdirectory: submission.value.subdirectory,
                     userId: user.id,
+                    imageUrl: submission.value.image,
                 }
             })
             return redirect('/dashboard/pages')
@@ -90,6 +91,7 @@ export async function CreatePageAction(_prevState: unknown, formData: FormData) 
             name: submission.value.name,
             subdirectory: submission.value.subdirectory,
             userId: user.id,
+            imageUrl: submission.value.image
           },
         });
         //console.log('Response:', response);

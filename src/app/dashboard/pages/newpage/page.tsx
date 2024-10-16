@@ -5,14 +5,20 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import React from 'react'
+import React, { useState } from 'react'
 import { useFormState } from 'react-dom'
 import { useForm } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { PageSchema } from '@/utils/zodSchema'
 import { SubmitButton } from '@/components/dashboard/SubmitButton'
+import Image from 'next/image'
+import { UploadDropzone } from '@/utils/UploadThing'
+import { toast } from 'sonner'
 
 function NewPageRoute() {
+
+    const [imageUrl, setImageUrl] = useState<undefined | string>(undefined)
+
     //get the 'status' of the serveraction and action->createSiteAction
     const [lastResult, action] = useFormState(CreatePageAction, undefined)
     //^^ this will keep track fo the form data
@@ -37,10 +43,10 @@ function NewPageRoute() {
             <Card className='max-w-[450px]'>
                 <CardHeader className=' flex gap-2 text-center'>
                     <CardTitle>
-                        Create a Site
+                        Create a new Page
                     </CardTitle>
                     <CardDescription>
-                        Create your site here and click &apos;Create&apos; to confirm!
+                        Create your page here and click &apos;Create&apos; to confirm!
                     </CardDescription>
                 </CardHeader>
 
@@ -74,6 +80,34 @@ function NewPageRoute() {
                                     defaultValue={fields.description.initialValue}
                                     placeholder='Add a small description here...' />
                                 <p className='text-red-500 text-sm'>{fields.description.errors}</p>
+                            </div>
+                            {/* cover image input */}
+                            <div className='grid gap-2'>
+                                <Label>Cover Image</Label>
+                                <input type="hidden"
+                                    name={fields.image.name}
+                                    key={fields.image.key}
+                                    defaultValue={fields.image.initialValue}
+                                    value={imageUrl}
+                                />
+                                {imageUrl ?
+                                    (
+                                        <Image src={imageUrl} alt='UploadedImage' className='object-cover w-[200px] h-[200px] rounded-lg' width={200} height={200} />
+                                    ) : (
+                                        <UploadDropzone
+                                            endpoint="imageUploader"
+                                            onClientUploadComplete={(res) => {
+                                                setImageUrl(res[0].url);
+                                                toast.success("Hooray! Image has been uploaded");
+                                            }}
+                                            onUploadError={(error) => {
+                                                console.error("Upload error:", error);
+                                                toast.error("Image upload failed: " + error.message);
+                                              }}
+                                        />
+                                    )}
+
+                                <p className='text-red-500 text-sm'>{fields.image.errors}</p>
                             </div>
                         </div>
                     </CardContent>

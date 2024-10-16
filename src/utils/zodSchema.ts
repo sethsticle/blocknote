@@ -13,6 +13,7 @@ export const PageSchema = z.object({
   name: z.string().min(1, "Name is required").max(40, "Name must be less than 40 characters"),
   description: z.string().min(1, "Description is required").max(200, "Description must be less than 200 characters"),
   subdirectory: z.string().min(1, "Subdirectory is required").max(40, "Subdirectory must be less than 40 characters"),
+  image: z.string().min(1, "Image is required")
 })
 
 export function PageCreationSchema(options?: {
@@ -48,6 +49,7 @@ export function PageCreationSchema(options?: {
         ),
         name: z.string().min(1, "Name is required").max(40, "Name must be less than 40 characters"),
         description: z.string().min(1, "Description is required").max(200, "Description must be less than 200 characters"),
+        image: z.string().min(1, "Image is required"),
 })
 
 }

@@ -38,7 +38,7 @@ async function Pages() {
         <>
             {/* button */}
             <div className='flex w-full justify-end'>
-                <Button asChild><Link href={'/dashboard/pages/new'}>
+                <Button asChild><Link href={'/dashboard/pages/newpage'}>
                     <PlusCircle className='mr-2 size-4' />Create page</Link></Button>
             </div>
 

@@ -53,3 +53,17 @@ export function PageCreationSchema(options?: {
 })
 
 }
+
+export const NoteSchema = z.object
+({
+    title: z.string().min(1, "Title is required").max(100, "Title must be less than 100 characters"),
+    slug: z.string().min(1, "Slug is required").max(100, "Slug must be less than 100 characters"),
+    image: z.string().min(1, "Image is required"),
+})
+export const UpdateNoteContentSchema = z.object
+({
+    content: z.string().min(1, "Content is required"),
+})
+
+
+

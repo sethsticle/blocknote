@@ -14,6 +14,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 // import { EmptyState } from '@/app/components/dashboard/EmptyState'
 import { requireUser } from '@/utils/requireUser'
 import prisma from '@/utils/db'
+import { EmptyState } from '@/components/dashboard/EmptyState'
 
 //  
 //  
@@ -93,7 +94,7 @@ async function PageIdRoute({ params, }: { params: { pageId: string } }) {
                 </Button>
 
                 <Button variant={'secondary'} asChild>
-                    <Link href={`/dashboard/sites/${params.pageId}/create`}><PlusCircle className='mr-2 size-4' />Create article</Link>
+                    <Link href={`/dashboard/pages/${params.pageId}/createnote`}><PlusCircle className='mr-2 size-4' />Create note</Link>
                 </Button>
 
                 <Button asChild>
@@ -101,9 +102,9 @@ async function PageIdRoute({ params, }: { params: { pageId: string } }) {
                 </Button>
             </div>
 
-            {/* default state for no posts made */}
+            {/* default state for no notes made */}
             {data === undefined || data.length === 0 ? (
-                <p>No Posts have been made</p>
+                <EmptyState title='No notes made' description='Create a new note to get started' path={`/dashboard/pages/${params.pageId}/createnote`} />
 
             ) :
                 // table displaying the posts made

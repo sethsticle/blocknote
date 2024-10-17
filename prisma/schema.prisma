@@ -51,7 +51,7 @@ model Page {
 
 model Note {
   id        String   @id @default(uuid())
-  content   Json // JSON to store the note content
+  content   Json?     @db.Json // JSON to store the note content
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   slug String @unique

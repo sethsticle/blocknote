@@ -22,5 +22,7 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "src/components/Editor.tsx", "src/components/EditorPage.tsx"]
+  "exclude": ["node_modules",]
 }
+//  "src/components/Editor.tsx", "src/components/EditorPage.tsx" - took this out of exclude...no idea what this scary page is
+

@@ -12,7 +12,7 @@ import React, {
 
 
 //TYPES//////////////////////////////////////////////////////////
-type ColumnType = "backlog" | "todo" | "doing" | "done";
+export type ColumnType = "backlog" | "todo" | "doing" | "done";
 
 type CardType = {
     title: string;
@@ -237,20 +237,24 @@ const Board = () => {
             {filteredCards.length}
           </span>
         </div>
-        <div
-          onDrop={handleDragEnd}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          className={`h-full w-full transition-colors ${
-            active ? "bg-neutral-800/50" : "bg-neutral-800/0"
-          }`}
-        >
-          {filteredCards.map((c) => {
-            return <Card key={c.id} {...c} handleDragStart={handleDragStart} />;
-          })}
-          <DropIndicator beforeId={null} column={column} />
-          <AddCard column={column} setCards={setCards} />
-        </div>
+       
+            <div
+              onDrop={handleDragEnd}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              className={`h-full w-full transition-colors ${
+                active ? "bg-neutral-800/50" : "bg-neutral-800/0"
+              }`}
+            >
+              {filteredCards.map((c) => {
+                return <Card key={c.id} {...c} handleDragStart={handleDragStart} />;
+              })}
+              <DropIndicator beforeId={null} column={column} />
+
+              
+              <AddCard column={column} setCards={setCards} />
+            </div>
+
       </div>
     );
   };

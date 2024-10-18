@@ -82,6 +82,7 @@ async function PageIdRoute({ params, }: { params: { pageId: string } }) {
     //Fetch the data from the post model related to the siteId and also the userId (dont think we need the toString but to be safe)
     const data = await getData(user.id.toString(), params.pageId.toString())
     console.log('Data:', data); // Log fetched data
+    
 
     return (
         <>
@@ -146,12 +147,14 @@ async function PageIdRoute({ params, }: { params: { pageId: string } }) {
                                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem asChild>
-                                                                <Link href={`/dashboard/sites/${params.pageId}/${item.id}`}>
+                                                                <Link href={`/dashboard/pages/${params.pageId}/${item.id}`}>
                                                                     Edit</Link>
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem asChild>
-                                                                <Link href={`/dashboard/sites/${params.pageId}/${item.id}/delete`}
+                                                            <DropdownMenuItem >
+                                                                {/* <Link href={`/dashboard/pages/${params.pageId}/${item.id}/delete`}
                                                                 ><span className='text-red-500'>Delete</span></Link>
+                                                                 */}
+                                                                 delete page
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>

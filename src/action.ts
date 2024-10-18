@@ -126,7 +126,8 @@ export async function CreateNoteAction(_prevState: unknown, formData: FormData) 
             image: submission.value.image,
             pageId,
             userId: user.id,
-            content: undefined
+            content: undefined,
+            column: "null",
         },
     })
 

@@ -57,6 +57,7 @@ model Note {
   slug String @unique
   image String 
   title String
+  column String 
 
   // Relation to Page (Many Notes <-> 1 Page)
   page   Page?  @relation(fields: [pageId], references: [id], name: "PageNotes", onDelete: Cascade)

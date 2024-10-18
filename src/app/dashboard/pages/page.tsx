@@ -75,11 +75,6 @@ async function Pages() {
                                         <Link href={`/dashboard/pages/${item.id}`}>Open</Link>
                                     </Button>
                                 </CardFooter>
-                                {/* <CardFooter>
-                                    <Button asChild className='w-full'>
-                                        <Link href={`/dashboard/pages/${item.id}`}>View Page</Link>
-                                    </Button>
-                                </CardFooter> */}
                             </Card>
                         ))}
                     </div>

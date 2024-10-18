@@ -31,6 +31,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hooks": "^1.0.1",
+    "react-slugify": "^4.0.1",
+    "slugify": "^1.6.6",
     "sonner": "^1.5.0",
     "swapy": "^0.4.2",
     "tailwind-merge": "^2.5.4",

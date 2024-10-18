@@ -7,7 +7,7 @@ import "@blocknote/mantine/style.css";
 import "@blocknote/react/style.css";
 import { BlockNoteEditor, BlockNoteSchema, defaultBlockSpecs, PartialBlock } from '@blocknote/core';
 import { useEffect, useMemo, useState } from "react";
-import { Button } from "./ui/button";
+import { Button } from "../../ui/button";
 
 import { UpdateNoteContentAction } from "@/action";
 

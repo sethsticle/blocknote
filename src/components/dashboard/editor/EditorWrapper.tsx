@@ -15,7 +15,7 @@ const EditorWrapper: React.FC<EditorWrapperProps> = ({ initialContent, pageId, n
 
   // Dynamically load the Editor component (client-side)
   const Editor = useMemo(
-    () => dynamic(() => import("@/components/Editor"), { ssr: false }),
+    () => dynamic(() => import("@/components/dashboard/editor/Editor"), { ssr: false }),
     []
   );
 

@@ -2,7 +2,7 @@
 import DashboardItems from '@/components/dashboard/DashboardItems';
 import { CircleUser, DollarSign, Globe, Home } from 'lucide-react';
 import Image from 'next/image';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, use } from 'react';
 import Link from 'next/link'; // Importing from next/link
 import NavbarMenu from '@/components/dashboard/NavbarMenu';
 import { ThemeToggle } from '@/components/dashboard/ThemeToggle';
@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from '@/components/ui/button';
 import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components';
 import LogoImage from '@/public/2.png'
+import { usePathname } from 'next/navigation';
 
 export const navLinks = [
     {
@@ -30,6 +31,8 @@ export const navLinks = [
 ];
 
 function DashboardLayout({ children }: { children: ReactNode }) {
+
+    const pathname = usePathname();
     return (
         <section className='grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'>
             <div className='hidden border-r bg-muted/40 md:block '>  {/*on small screens we dont show */}
@@ -60,7 +63,7 @@ function DashboardLayout({ children }: { children: ReactNode }) {
                     </div>
 
                     <div className='ml-auto flex items-center gap-5'>
-
+                        <h1 className='text-teal-500 '>{pathname}</h1>
                         <ThemeToggle />
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

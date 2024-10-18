@@ -1,6 +1,6 @@
 // page.tsx
 import prisma from "@/utils/db";
-import EditorWrapper from "@/components/EditorWrapper";
+import EditorWrapper from "@/components/dashboard/editor/EditorWrapper";
 
 export default async function Page({ params }: { params: { pageId: string, noteId: string } }) {
   console.log("Params.pageId: ", params.pageId);

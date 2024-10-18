@@ -1,177 +1,252 @@
 
-////////////////////////////////////getData function and original table setup for pages//////////////////////////////////////////////////////
+import { Button } from "@/components/ui/button";
+import prisma from "@/utils/db";
+import { requireUser } from "@/utils/requireUser";
+import dynamic from "next/dynamic";
+import Link from "next/link";
 
-import { Button } from '@/components/ui/button'
-import { BookIcon, MoreHorizontal, PlusCircle, SettingsIcon } from 'lucide-react'
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
-import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import Image from 'next/image'
-import { Badge } from '@/components/ui/badge'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-// import { EmptyState } from '@/app/components/dashboard/EmptyState'
-import { requireUser } from '@/utils/requireUser'
-import prisma from '@/utils/db'
-import { EmptyState } from '@/components/dashboard/EmptyState'
 
-//  
-//  
-// we want to fetch the data from the post model related to the pageId and also the userId
-// we will get the user and page id through params and when called just passed as args
 
+
+const NoteDNDWrapper = dynamic(()=> import('@/components/dashboard/pages/NotesDnD'), {ssr: false})
+
+// Server-side data fetching function
 async function getData(userId: string, pageId: string) {
-    try {
-        // First, find the page to ensure it exists
-        const page = await prisma.page.findUnique({
-            where: {
-                id: pageId,
-            },
-            select: {
-                id: true, // We're just checking if the site exists
-            },
-        });
-
-        if (!page) {
-            // If the site is not found, throw notFound()
-            notFound(); // This will automatically trigger the Next.js 404 page
-        }
-
-        // Fetch related posts if the site exists
-        const data = await prisma.note.findMany({
-            where: {
-                userId,
-                pageId,
-            },
-            select: {
-                image: true,
-                title: true,
-                createdAt: true,
-                id: true,
-                page: {
-                    select: {
-                        subdirectory: true,
-                    },
-                },
-            },
-            orderBy: { createdAt: 'desc' },
-        });
-
-        return data;
-    } catch (error) {
-        console.error("Error fetching data:", error);
-        notFound(); // Also trigger 404 in case of any other errors
-    }
+    const page = await prisma.page.findUnique({
+      where: { id: pageId },
+      select: { id: true },
+    });
+  
+    if (!page) return null;
+  
+    const data = await prisma.note.findMany({
+        where: { userId, pageId },
+        select: {
+          image: true,
+          title: true,
+          createdAt: true,
+          id: true,
+          page: { select: { subdirectory: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+      
+      // Handle nullable subdirectory
+      const formattedData = data.map(item => ({
+        ...item,
+        createdAt: item.createdAt.toISOString(), // Convert Date to string
+        page: { subdirectory: item.page?.subdirectory || "" }, // If page is null, make subdirectory null
+      }));
+      
+      return formattedData;
+    
 }
 
+export default async function PageIdRoute({ params }: { params: { pageId: string } }) {
+    const user = await requireUser();
+    const data = await getData(user.id.toString(), params.pageId.toString());
+  
+    return (
+      <main className="container mx-auto p-4 space-y-4">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Notes</h1>
+          <Link href={`/dashboard/pages/${params.pageId}/createnote`}>
+            <Button>Create Note</Button>
+          </Link>
+        </div>
+        {!data || data.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="text-xl">No notes available. Create one to get started.</p>
+          </div>
+        ) : (
+          <NoteDNDWrapper notes={data} pageId={params.pageId} />
+        )}
+      </main>
+    );
+  }
 
-//server component->safe for async
-//params of the siteId->relates to [siteId]
-async function PageIdRoute({ params, }: { params: { pageId: string } }) {
 
-    const user = await requireUser()
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////******WORKING TABLE OF NOTES**************???????????????????? */
 
-    //console.log('User ID:', user.id); // Check if user ID is correct
-    console.log('User ID in string:', user.id.toString()); // Check if user ID is correct
-    console.log('Page ID:', params.pageId); // Check if page ID is correct
-    console.log('prisma query returns below:')
-    //console.log(await prisma.$queryRaw`SELECT "id", "pageId", "title" FROM "Page" WHERE "userId" = ${user.id} AND "pageId" = ${params.pageId};`)
 
-    //Fetch the data from the post model related to the siteId and also the userId (dont think we need the toString but to be safe)
-    const data = await getData(user.id.toString(), params.pageId.toString())
-    console.log('Data:', data); // Log fetched data
+
+// ////////////////////////////////////getData function and original table setup for pages//////////////////////////////////////////////////////
+
+// import { Button } from '@/components/ui/button'
+// import { BookIcon, MoreHorizontal, PlusCircle, SettingsIcon } from 'lucide-react'
+// import { notFound } from 'next/navigation'
+// import Link from 'next/link'
+// import React from 'react'
+// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+// import Image from 'next/image'
+// import { Badge } from '@/components/ui/badge'
+// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+// // import { EmptyState } from '@/app/components/dashboard/EmptyState'
+// import { requireUser } from '@/utils/requireUser'
+// import prisma from '@/utils/db'
+// import { EmptyState } from '@/components/dashboard/EmptyState'
+
+// //  
+// //  
+// // we want to fetch the data from the post model related to the pageId and also the userId
+// // we will get the user and page id through params and when called just passed as args
+
+// async function getData(userId: string, pageId: string) {
+//     try {
+//         // First, find the page to ensure it exists
+//         const page = await prisma.page.findUnique({
+//             where: {
+//                 id: pageId,
+//             },
+//             select: {
+//                 id: true, // We're just checking if the site exists
+//             },
+//         });
+
+//         if (!page) {
+//             // If the site is not found, throw notFound()
+//             notFound(); // This will automatically trigger the Next.js 404 page
+//         }
+
+//         // Fetch related posts if the site exists
+//         const data = await prisma.note.findMany({
+//             where: {
+//                 userId,
+//                 pageId,
+//             },
+//             select: {
+//                 image: true,
+//                 title: true,
+//                 createdAt: true,
+//                 id: true,
+//                 page: {
+//                     select: {
+//                         subdirectory: true,
+//                     },
+//                 },
+//             },
+//             orderBy: { createdAt: 'desc' },
+//         });
+
+//         return data;
+//     } catch (error) {
+//         console.error("Error fetching data:", error);
+//         notFound(); // Also trigger 404 in case of any other errors
+//     }
+// }
+
+
+// //server component->safe for async
+// //params of the siteId->relates to [siteId]
+// async function PageIdRoute({ params, }: { params: { pageId: string } }) {
+
+//     const user = await requireUser()
+//     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//     //console.log('User ID:', user.id); // Check if user ID is correct
+//     console.log('User ID in string:', user.id.toString()); // Check if user ID is correct
+//     console.log('Page ID:', params.pageId); // Check if page ID is correct
+//     console.log('prisma query returns below:')
+//     //console.log(await prisma.$queryRaw`SELECT "id", "pageId", "title" FROM "Page" WHERE "userId" = ${user.id} AND "pageId" = ${params.pageId};`)
+
+//     //Fetch the data from the post model related to the siteId and also the userId (dont think we need the toString but to be safe)
+//     const data = await getData(user.id.toString(), params.pageId.toString())
+//     console.log('Data:', data); // Log fetched data
     
 
-    return (
-        <>
-            {/* buttons */}
-            <div className='flex w-full justify-end gap-x-4'>
-                <Button variant={'secondary'} asChild>
-                    {data.length > 0 && data[0]?.page && (
-                        <Link href={`/blog/${data[0].page.subdirectory}`}><BookIcon className='mr-2 size-4' />View Blog</Link>
-                    )}
-                </Button>
+//     return (
+//         <>
+//             {/* buttons */}
+//             <div className='flex w-full justify-end gap-x-4'>
+//                 <Button variant={'secondary'} asChild>
+//                     {data.length > 0 && data[0]?.page && (
+//                         <Link href={`/blog/${data[0].page.subdirectory}`}><BookIcon className='mr-2 size-4' />View Blog</Link>
+//                     )}
+//                 </Button>
 
-                <Button variant={'secondary'} asChild>
-                    <Link href={`/dashboard/pages/${params.pageId}/createnote`}><PlusCircle className='mr-2 size-4' />Create note</Link>
-                </Button>
+//                 <Button variant={'secondary'} asChild>
+//                     <Link href={`/dashboard/pages/${params.pageId}/createnote`}><PlusCircle className='mr-2 size-4' />Create note</Link>
+//                 </Button>
 
-                <Button asChild>
-                    <Link href={`/dashboard/sites/${params.pageId}/settings`}><SettingsIcon className='mr-2 size-4' />Settings</Link>
-                </Button>
-            </div>
+//                 <Button asChild>
+//                     <Link href={`/dashboard/sites/${params.pageId}/settings`}><SettingsIcon className='mr-2 size-4' />Settings</Link>
+//                 </Button>
+//             </div>
 
-            {/* default state for no notes made */}
-            {data === undefined || data.length === 0 ? (
-                <EmptyState title='No notes made' description='Create a new note to get started' path={`/dashboard/pages/${params.pageId}/createnote`} />
+//             {/* default state for no notes made */}
+//             {data === undefined || data.length === 0 ? (
+//                 <EmptyState title='No notes made' description='Create a new note to get started' path={`/dashboard/pages/${params.pageId}/createnote`} />
 
-            ) :
-                // table displaying the posts made
-                (
-                    <div>
-                        <Card className=''>
-                            <CardHeader>
-                                <CardTitle className='text-2xl'>Posts</CardTitle>
-                                <CardDescription>Manage your posts in a simple and intuitive interface</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Image</TableHead>
-                                            <TableHead>Title</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead>Created At</TableHead>
-                                            <TableHead className='text-right'>Actions</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {data.map((item) => (
-                                            <TableRow key={item.id}>
-                                                <TableCell>
-                                                    <Image src={item.image} alt={item.title} className='size-16 rounded-md object-cover' width={64} height={64} />
-                                                </TableCell>
-                                                <TableCell className=''>{item.title}</TableCell>
-                                                <TableCell><Badge className='bg-green-500/10 text-green-500' variant={'outline'}>Published</Badge></TableCell>
-                                                <TableCell>{item.createdAt.toDateString()}</TableCell>
-                                                <TableCell className="text-end">
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button size="icon" variant="ghost">
-                                                                <MoreHorizontal className="size-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                            <DropdownMenuSeparator />
-                                                            <DropdownMenuItem asChild>
-                                                                <Link href={`/dashboard/pages/${params.pageId}/${item.id}`}>
-                                                                    Edit</Link>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem >
-                                                                {/* <Link href={`/dashboard/pages/${params.pageId}/${item.id}/delete`}
-                                                                ><span className='text-red-500'>Delete</span></Link>
-                                                                 */}
-                                                                 delete page
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </CardContent>
-                        </Card>
-                    </div>
-                )}
-        </>
-    )
-}
+//             ) :
+//                 // table displaying the posts made
+//                 (
+//                     <div>
+//                         <Card className=''>
+//                             <CardHeader>
+//                                 <CardTitle className='text-2xl'>Posts</CardTitle>
+//                                 <CardDescription>Manage your posts in a simple and intuitive interface</CardDescription>
+//                             </CardHeader>
+//                             <CardContent>
+//                                 <Table>
+//                                     <TableHeader>
+//                                         <TableRow>
+//                                             <TableHead>Image</TableHead>
+//                                             <TableHead>Title</TableHead>
+//                                             <TableHead>Status</TableHead>
+//                                             <TableHead>Created At</TableHead>
+//                                             <TableHead className='text-right'>Actions</TableHead>
+//                                         </TableRow>
+//                                     </TableHeader>
+//                                     <TableBody>
 
-export default PageIdRoute
+//                                         {data.map((item) => (
+
+//                                             <TableRow key={item.id}>
+//                                                 <TableCell>
+//                                                     <Image src={item.image} alt={item.title} className='size-16 rounded-md object-cover' width={64} height={64} />
+//                                                 </TableCell>
+//                                                 <TableCell className=''>{item.title}</TableCell>
+//                                                 <TableCell><Badge className='bg-green-500/10 text-green-500' variant={'outline'}>Published</Badge></TableCell>
+//                                                 <TableCell>{item.createdAt.toDateString()}</TableCell>
+//                                                 <TableCell className="text-end">
+//                                                     <DropdownMenu>
+//                                                         <DropdownMenuTrigger asChild>
+//                                                             <Button size="icon" variant="ghost">
+//                                                                 <MoreHorizontal className="size-4" />
+//                                                             </Button>
+//                                                         </DropdownMenuTrigger>
+//                                                         <DropdownMenuContent align="end">
+//                                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+//                                                             <DropdownMenuSeparator />
+//                                                             <DropdownMenuItem asChild>
+//                                                                 <Link href={`/dashboard/pages/${params.pageId}/${item.id}`}>
+//                                                                     Edit</Link>
+//                                                             </DropdownMenuItem>
+//                                                             <DropdownMenuItem >
+//                                                                 {/* <Link href={`/dashboard/pages/${params.pageId}/${item.id}/delete`}
+//                                                                 ><span className='text-red-500'>Delete</span></Link>
+//                                                                  */}
+//                                                                  delete page
+//                                                             </DropdownMenuItem>
+//                                                         </DropdownMenuContent>
+//                                                     </DropdownMenu>
+//                                                 </TableCell>
+//                                             </TableRow>
+//                                         ))}
+//                                     </TableBody>
+//                                 </Table>
+//                             </CardContent>
+//                         </Card>
+//                     </div>
+//                 )}
+//         </>
+//     )
+// }
+
+// export default PageIdRoute
+
+////**************WORKING ON THIS PAGE****************
 
 // // "use client"
 // import React, {
